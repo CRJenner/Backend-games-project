@@ -5,3 +5,5 @@ const app = express();
 app.use(express.json());
 
 app.get("/api/categories", categoryObjects);
+
+module.exports = app;
