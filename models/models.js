@@ -12,3 +12,13 @@ exports.fetchCategories = () => {
     });
   }
 };
+
+exports.fetchReviews = (review_id) => {
+  console.log("in the model");
+  return db
+    .query(`SELECT * FROM reviews WHERE review_id = $1;`, [review_id])
+    .then(({ rows }) => {
+      console.log(rows[0]);
+      return rows[0];
+    });
+};

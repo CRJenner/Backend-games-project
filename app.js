@@ -1,10 +1,12 @@
 const express = require("express");
-const { categoryObjects } = require("./controllers/controllers");
+const { categoryObjects, reviewObject } = require("./controllers/controllers");
 const app = express();
 
 app.use(express.json());
 
 app.get("/api/categories", categoryObjects);
+
+app.get("/api/reviews/:review_id", reviewObject);
 
 app.use((err, request, response, next) => {
   console.log(err);
