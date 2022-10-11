@@ -15,12 +15,12 @@ exports.fetchCategories = () => {
 
 exports.fetchReviews = (review_id) => {
   console.log("in the model");
-  if (isNaN(review_id) === true) {
-    return Promise.reject({
-      status: 400,
-      msg: "Invalid input, use a number",
-    });
-  }
+  // if (isNaN(review_id) === true) {
+  //   return Promise.reject({
+  //     status: 400,
+  //     msg: "Invalid input, use a number",
+  //   });
+  // }
   return db
     .query(`SELECT * FROM reviews WHERE review_id = $1;`, [review_id])
     .then(({ rows: review }) => {

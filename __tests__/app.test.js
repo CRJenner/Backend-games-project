@@ -37,9 +37,8 @@ describe("app", () => {
         .get(`/api/reviews/${review_id}`)
         .expect(200)
         .then((response) => {
-          const reviews = response.body.review;
-          console.log(reviews);
-          expect(reviews).toEqual(
+          const review = response.body.review;
+          expect(review).toEqual(
             expect.objectContaining({
               review_id: expect.any(Number),
               title: expect.any(String),
@@ -60,7 +59,7 @@ describe("app", () => {
 
 describe("Error handling", () => {
   describe("1. GET /api/categories", () => {
-    test("404: handles the error", () => {
+    test("responds with a 404 for invalid path error", () => {
       return request(app).get("/api/notAPath").expect(404);
     });
   });
