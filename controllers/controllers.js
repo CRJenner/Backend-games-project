@@ -1,4 +1,4 @@
-const { fetchCategories } = require("../models/models");
+const { fetchCategories, fetchReviews } = require("../models/models");
 
 exports.categoryObjects = (request, response, next) => {
   fetchCategories()
@@ -8,4 +8,13 @@ exports.categoryObjects = (request, response, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.reviewObject = (request, response, next) => {
+  const { review_id } = request.params;
+  fetchReviews(review_id)
+    .then((review) => {
+      response.status(200).send({ review });
+    })
+    .catch(next);
 };
