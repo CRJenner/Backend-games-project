@@ -12,8 +12,9 @@ exports.categoryObjects = (request, response, next) => {
 
 exports.reviewObject = (request, response, next) => {
   const { review_id } = request.params;
-  fetchReviews(review_id).then((review) => {
-    console.log({ review });
-    response.status(200).send({ review });
-  });
+  fetchReviews(review_id)
+    .then((review) => {
+      response.status(200).send({ review });
+    })
+    .catch(next);
 };

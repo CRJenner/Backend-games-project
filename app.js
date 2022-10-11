@@ -5,21 +5,26 @@ const app = express();
 app.use(express.json());
 
 app.get("/api/categories", categoryObjects);
-
 app.get("/api/reviews/:review_id", reviewObject);
 
 app.use((err, request, response, next) => {
-  console.log(err);
   if (err.status && err.msg) {
-    res.status(err.status).send({ msg: err.msg });
+    response.status(err.status).send({ msg: err.msg });
   } else {
-    next(error);
+    next(err);
   }
 });
-// response.status(404).send({ msg: "Not a valid path" });
 
-// app.use((err, request, response, next) => {
-//   response.status(500).send({ msg: "500 Internal Error" });
-// });
+app.use((err, req, response, next) => {
+  if (err.code === "22P02") {
+    response.status(400).send({ message: err.message });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, response, next) => {
+  reponse.status(500).send("Server Error!");
+});
 
 module.exports = app;
