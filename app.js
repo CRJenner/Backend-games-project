@@ -1,11 +1,16 @@
 const express = require("express");
-const { categoryObjects, reviewObject } = require("./controllers/controllers");
+const {
+  categoryObjects,
+  reviewObject,
+  collectUsers,
+} = require("./controllers/controllers");
 const app = express();
 
 app.use(express.json());
 
 app.get("/api/categories", categoryObjects);
 app.get("/api/reviews/:review_id", reviewObject);
+app.get("/api/users", collectUsers);
 
 app.use((err, request, response, next) => {
   if (err.code === "22P02") {
@@ -17,6 +22,7 @@ app.use((err, request, response, next) => {
 
 app.use((err, request, response, next) => {
   if (err.status && err.msg) {
+    console.log(err.msg);
     response.status(404).send({ msg: err.msg });
   } else {
     next(err);

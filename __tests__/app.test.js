@@ -55,6 +55,27 @@ describe("app", () => {
         });
     });
   });
+  describe("3. GET: /api/users", () => {
+    test("200: responds with an array of users which should have the following properties, username,name and avatar_url", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then((response) => {
+          const {
+            body: { users },
+          } = response;
+          users.forEach((user) => {
+            expect(user).toEqual(
+              expect.objectContaining({
+                username: expect.any(String),
+                name: expect.any(String),
+                avatar_url: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+  });
 });
 
 describe("Error handling", () => {
@@ -77,10 +98,17 @@ describe("Error handling", () => {
       return request(app)
         .get("/api/reviews/99999")
         .expect(404)
-        .then(({ body }) => {
-          const { msg } = body;
+        .then((response) => {
+          const {
+            body: { msg },
+          } = response;
           expect(msg).toBe("Review ID not found, try another number.");
         });
+    });
+  });
+  describe("3. GET /api/users", () => {
+    test("responds with a 404 for invalid path error", () => {
+      return request(app).get("/api/notAUser").expect(404);
     });
   });
 });
