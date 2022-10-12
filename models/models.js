@@ -22,7 +22,27 @@ exports.fetchReviews = (review_id) => {
 
 exports.fetchUsers = () => {
   return db.query(`SELECT * FROM users;`).then(({ rows: users }) => {
-    console.log(users);
     return users;
   });
+};
+
+exports.updateReviews = (review_id, inc_votes) => {
+  return db
+    .query(
+      `UPDATE reviews
+      SET votes = votes + $1 
+      WHERE review_id = $2 
+      RETURNING *;`,
+      [inc_votes, review_id]
+    )
+    .then(({ rows: updateReviews }) => {
+      if (!inc_votes || typeof inc_votes !== "number") {
+        return Promise.reject({
+          status: 400,
+          msg: "Invalid input, use a number",
+        });
+      }
+      console.log(updateReviews[0]);
+      return updateReviews[0];
+    });
 };
