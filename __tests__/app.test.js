@@ -76,6 +76,41 @@ describe("app", () => {
         });
     });
   });
+  describe("PATCH /api/reviews/:review_id", () => {
+    test("200: Patch returns the updated article", () => {
+      const review_id = 2;
+      return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(({ body }) => {
+          console.log(body);
+          expect(typeof body).toBe("object");
+        });
+    });
+    test(`should update review by id in this form { inc_votes : newVote } and should respond with updated object.`, () => {
+      const review_id = 2;
+      return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send({ inc_votes: 2 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toBeInstanceOf(Object);
+          expect(body).toEqual({
+            title: "Jenga",
+            designer: "Leslie Scott",
+            owner: "philippaclaire9",
+            review_img_url:
+              "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+            review_id: 2,
+            review_body: "Fiddly fun for all the family",
+            category: "dexterity",
+            created_at: "2021-01-18T10:01:41.251Z",
+            votes: 7,
+          });
+        });
+    });
+  });
 });
 
 describe("Error handling", () => {
@@ -109,6 +144,19 @@ describe("Error handling", () => {
   describe("3. GET /api/users", () => {
     test("responds with a 404 for invalid path error", () => {
       return request(app).get("/api/notAUser").expect(404);
+    });
+  });
+  describe("4. GET: /api/reviews/:review_id", () => {
+    test("responds with a 400 and returns error message when no valid number is entered", () => {
+      const review_id = 2;
+      return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send({ inc_votes: "one" })
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Invalid input, use a number");
+        });
     });
   });
 });
