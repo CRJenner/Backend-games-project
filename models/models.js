@@ -36,7 +36,7 @@ exports.updateReviews = (review_id, inc_votes) => {
       [inc_votes, review_id]
     )
     .then(({ rows: updateReviews }) => {
-      if (typeof inc_votes !== "number") {
+      if (!inc_votes || typeof inc_votes !== "number") {
         return Promise.reject({
           status: 400,
           msg: "Invalid input, use a number",

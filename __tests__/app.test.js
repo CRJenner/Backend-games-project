@@ -76,8 +76,8 @@ describe("app", () => {
         });
     });
   });
-  describe("PATCH /api/reviews/:review_id", () => {
-    test("200: Patch returns the updated article", () => {
+  describe("4. PATCH /api/reviews/:review_id", () => {
+    test("200: Patch returns an object", () => {
       const review_id = 2;
       return request(app)
         .patch(`/api/reviews/${review_id}`)
@@ -152,6 +152,17 @@ describe("Error handling", () => {
       return request(app)
         .patch(`/api/reviews/${review_id}`)
         .send({ inc_votes: "one" })
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Invalid input, use a number");
+        });
+    });
+    test("Responds with a 400 and returns and error message when no inc amount entered", () => {
+      const review_id = 2;
+      return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send({ inc_votes: "" })
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
