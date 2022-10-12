@@ -38,6 +38,7 @@ describe("app", () => {
         .expect(200)
         .then((response) => {
           const review = response.body.review;
+          console.log(review);
           expect(review).toEqual(
             expect.objectContaining({
               review_id: expect.any(Number),
@@ -50,6 +51,7 @@ describe("app", () => {
               category: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
+              comment_count: expect.any(Number),
             })
           );
         });
@@ -146,7 +148,7 @@ describe("Error handling", () => {
       return request(app).get("/api/notAUser").expect(404);
     });
   });
-  describe("4. GET: /api/reviews/:review_id", () => {
+  describe("4. PATCH: /api/reviews/:review_id", () => {
     test("responds with a 400 and returns error message when no valid number is entered", () => {
       const review_id = 2;
       return request(app)

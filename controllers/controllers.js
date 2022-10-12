@@ -8,6 +8,7 @@ const {
 exports.categoryObjects = (request, response, next) => {
   fetchCategories()
     .then((category) => {
+      console.log({ category });
       response.status(200).send({ category });
     })
     .catch((err) => {
@@ -39,7 +40,6 @@ exports.patchUpdateReviews = (request, response, next) => {
   const { inc_votes } = request.body;
   updateReviews(review_id, inc_votes)
     .then((updatedReview) => {
-      console.log(updatedReview);
       response.status(200).send(updatedReview);
     })
     .catch((err) => {
