@@ -5,6 +5,7 @@ const {
   collectUsers,
   patchUpdateReviews,
   getAllReviews,
+  collectComments,
 } = require("./controllers/controllers");
 const app = express();
 
@@ -15,6 +16,7 @@ app.get("/api/reviews/:review_id", reviewObject);
 app.get("/api/users", collectUsers);
 app.patch("/api/reviews/:review_id", patchUpdateReviews);
 app.get("/api/reviews", getAllReviews);
+app.get("/api/reviews/:review_id/comments", collectComments);
 
 app.use((err, request, response, next) => {
   if (err.status && err.msg) {

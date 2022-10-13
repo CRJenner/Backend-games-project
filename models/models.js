@@ -73,3 +73,23 @@ LEFT JOIN comments ON comments.review_id = reviews.review_id`;
     return review;
   });
 };
+
+exports.fetchAllComments = (review_id) => {
+  return db
+    .query(
+      `SELECT *
+FROM comments
+WHERE review_id = $1
+ORDER BY created_at DESC;`,
+      [review_id]
+    )
+    .then(({ rows: comments }) => {
+      if (comments.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Review ID not found, try another number.",
+        });
+      }
+      return comments;
+    });
+};

@@ -4,6 +4,7 @@ const {
   fetchUsers,
   updateReviews,
   fetchAllReviews,
+  fetchAllComments,
 } = require("../models/models");
 
 exports.categoryObjects = (request, response, next) => {
@@ -56,4 +57,13 @@ exports.getAllReviews = (request, response, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.collectComments = (request, response, next) => {
+  const { review_id } = request.params;
+  fetchAllComments(review_id)
+    .then((comments) => {
+      response.status(200).send({ comments });
+    })
+    .catch(next);
 };

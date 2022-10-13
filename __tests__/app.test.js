@@ -111,91 +111,111 @@ describe("app", () => {
         });
     });
   });
-  describe("5. GET /api/reviews", () => {
-    test("200 response with an array of reviews in descending date created_at", () => {
+  describe("6. GET: /api/reviews/:review_id/comments", () => {
+    test("200: an array of comments for the given review_id of which each comment should have the following properties, comment_id, votes, created_at, author, body and review_id", () => {
+      const review_id = 2;
       return request(app)
-        .get("/api/reviews")
+        .get(`/api/reviews/${review_id}/comments`)
         .expect(200)
         .then(({ body }) => {
-          let reviews = body.reviews;
-          expect(reviews.length).toEqual(13);
-          expect(reviews).toBeSortedBy("created_at", {
-            descending: true,
-          });
-          reviews.forEach((review) => {
-            expect(review).toEqual(
+          let comments = body.comments;
+          comments.forEach((comment) => {
+            expect(comment).toEqual(
               expect.objectContaining({
-                review_id: expect.any(Number),
-                title: expect.any(String),
-                category: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
                 created_at: expect.any(String),
-                review_img_url: expect.any(String),
-                designer: expect.any(String),
+                comment_id: expect.any(Number),
                 votes: expect.any(Number),
-                comment_count: expect.any(Number),
+                review_id: expect.any(Number),
               })
             );
+          });
+          expect(comments.length).toEqual(3);
+          expect(comments).toBeSortedBy("created_at", {
+            descending: true,
           });
         });
     });
   });
+});
 
-  describe("Error handling", () => {
-    describe("1. GET /api/categories", () => {
-      test("responds with a 404 for invalid path error", () => {
-        return request(app).get("/api/notAPath").expect(404);
-      });
+describe("Error handling", () => {
+  describe("1. GET /api/categories", () => {
+    test("responds with a 404 for invalid path error", () => {
+      return request(app).get("/api/notAPath").expect(404);
     });
-    describe("2. GET: /api/reviews/:review_id", () => {
-      test("responds with 400 for invalid review_id", () => {
-        return request(app)
-          .get("/api/reviews/banana")
-          .expect(400)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("Invalid input, use a number");
-          });
-      });
-      test("responds with a 404 if review_id is not in the db", () => {
-        return request(app)
-          .get("/api/reviews/99999")
-          .expect(404)
-          .then((response) => {
-            const {
-              body: { msg },
-            } = response;
-            expect(msg).toBe("Review ID not found, try another number.");
-          });
-      });
+  });
+  describe("2. GET: /api/reviews/:review_id", () => {
+    test("responds with 400 for invalid review_id", () => {
+      return request(app)
+        .get("/api/reviews/banana")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Invalid input, use a number");
+        });
     });
-    describe("3. GET /api/users", () => {
-      test("responds with a 404 for invalid path error", () => {
-        return request(app).get("/api/notAUser").expect(404);
-      });
+    test("responds with a 404 if review_id is not in the db", () => {
+      return request(app)
+        .get("/api/reviews/99999")
+        .expect(404)
+        .then((response) => {
+          const {
+            body: { msg },
+          } = response;
+          expect(msg).toBe("Review ID not found, try another number.");
+        });
     });
-    describe("4. PATCH: /api/reviews/:review_id", () => {
-      test("responds with a 400 and returns error message when no valid number is entered", () => {
-        const review_id = 2;
-        return request(app)
-          .patch(`/api/reviews/${review_id}`)
-          .send({ inc_votes: "one" })
-          .expect(400)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("Invalid input, use a number");
-          });
-      });
-      test("Responds with a 400 and returns and error message when no inc amount entered", () => {
-        const review_id = 2;
-        return request(app)
-          .patch(`/api/reviews/${review_id}`)
-          .send({ inc_votes: "" })
-          .expect(400)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("Invalid input, use a number");
-          });
-      });
+  });
+  describe("3. GET /api/users", () => {
+    test("responds with a 404 for invalid path error", () => {
+      return request(app).get("/api/notAUser").expect(404);
+    });
+  });
+  describe("4. PATCH: /api/reviews/:review_id", () => {
+    test("responds with a 400 and returns error message when no valid number is entered", () => {
+      const review_id = 2;
+      return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send({ inc_votes: "one" })
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Invalid input, use a number");
+        });
+    });
+    test("Responds with a 400 and returns and error message when no inc amount entered", () => {
+      const review_id = 2;
+      return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send({ inc_votes: "" })
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Invalid input, use a number");
+        });
+    });
+  });
+  describe("6. GET: /api/reviews/:review_id/comments", () => {
+    test("Responds with a 400 when the id is invalid", () => {
+      return request(app)
+        .get(`/api/reviews/invalidId/comments`)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({ msg: "Invalid input, use a number" });
+        });
+    });
+    test("responds with a 404 if review_id is valid but no reviews", () => {
+      return request(app)
+        .get("/api/reviews/99999/comments")
+        .expect(404)
+        .then((response) => {
+          const {
+            body: { msg },
+          } = response;
+          expect(msg).toBe("Review ID not found, try another number.");
+        });
     });
   });
 });
