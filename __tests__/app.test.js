@@ -119,6 +119,7 @@ describe("app", () => {
         .expect(200)
         .then(({ body }) => {
           let comments = body.comments;
+          expect(comments.length).toEqual(3);
           comments.forEach((comment) => {
             expect(comment).toEqual(
               expect.objectContaining({
@@ -131,7 +132,6 @@ describe("app", () => {
               })
             );
           });
-          expect(comments.length).toEqual(3);
           expect(comments).toBeSortedBy("created_at", {
             descending: true,
           });
