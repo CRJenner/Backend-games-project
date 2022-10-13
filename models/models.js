@@ -54,3 +54,30 @@ exports.updateReviews = (review_id, inc_votes) => {
       return updateReviews[0];
     });
 };
+
+exports.fetchAllReviews = (category) => {
+  console.log("in the model");
+  let intitialQuery = `SELECT reviews.*,
+COUNT (comments.review_id) ::INT 
+AS comment_count
+FROM reviews 
+LEFT JOIN comments ON comments.review_id = reviews.review_id`;
+  if (category) {
+    (intitialQuery += `WHERE category = $1
+      GROUP BY reviews.review_id
+      ORDER BY reviews.created_at DESC;`),
+      [category];
+  } else if (!category)
+    intitialQuery += `  GROUP BY reviews.review_id
+      ORDER BY reviews.created_at DESC;`;
+  return db.query(intitialQuery).then(({ rows: review }) => {
+    // if (review.length === 0) {
+    //   return Promise.reject({
+    //     status: 404,
+    //     msg: "Review ID not found, try another number.",
+    //   });
+    // }
+    console.log(review.length);
+    return review;
+  });
+};

@@ -3,12 +3,12 @@ const {
   fetchReviews,
   fetchUsers,
   updateReviews,
+  fetchAllReviews,
 } = require("../models/models");
 
 exports.categoryObjects = (request, response, next) => {
   fetchCategories()
     .then((category) => {
-      console.log({ category });
       response.status(200).send({ category });
     })
     .catch((err) => {
@@ -41,6 +41,17 @@ exports.patchUpdateReviews = (request, response, next) => {
   updateReviews(review_id, inc_votes)
     .then((updatedReview) => {
       response.status(200).send(updatedReview);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getAllReviews = (request, response, next) => {
+  const { category } = request.query;
+  fetchAllReviews(category)
+    .then((reviews) => {
+      response.status(200).send({ reviews });
     })
     .catch((err) => {
       next(err);
