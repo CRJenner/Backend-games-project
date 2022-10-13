@@ -5,6 +5,7 @@ const {
   updateReviews,
   fetchAllReviews,
   fetchAllComments,
+  postedComment,
 } = require("../models/models");
 
 exports.categoryObjects = (request, response, next) => {
@@ -66,4 +67,19 @@ exports.collectComments = (request, response, next) => {
       response.status(200).send({ comments });
     })
     .catch(next);
+};
+
+exports.postComment = (request, response, next) => {
+  const { username } = request.body;
+  const { body } = request.body;
+  const { review_id } = request.params;
+  postedComment(username, body, review_id)
+    .then((comments) => {
+      console.log(comments);
+      response.status(201).send({ comments });
+    })
+    .catch((err) => {
+      console.log(err);
+      next(err);
+    });
 };

@@ -138,6 +138,30 @@ describe("app", () => {
         });
     });
   });
+  describe.only("7. POST /api/reviews/:review_id/comments", () => {
+    test("201: publish a new comment using username and body", () => {
+      const newComment = {
+        username: "mallionaire",
+        body: "Best comment ever.",
+      };
+      return request(app)
+        .post("/api/reviews/3/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          let comment = body.comments;
+          console.log(comment);
+          expect(comment).toEqual({
+            body: "Best comment ever.",
+            votes: expect.any(Number),
+            author: "mallionaire",
+            review_id: 3,
+            created_at: expect.any(String),
+            comment_id: expect.any(Number),
+          });
+        });
+    });
+  });
 });
 
 describe("Error handling", () => {
