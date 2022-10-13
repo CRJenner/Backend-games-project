@@ -117,7 +117,6 @@ describe("app", () => {
         .get("/api/reviews")
         .expect(200)
         .then(({ body }) => {
-          console.log(body.reviews);
           let reviews = body.reviews;
           expect(reviews.length).toEqual(13);
           expect(reviews).toBeSortedBy("created_at", {
