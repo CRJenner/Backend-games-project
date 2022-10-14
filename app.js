@@ -33,8 +33,11 @@ app.use((err, request, response, next) => {
     response.status(400).send({ msg: "Invalid input, use a number" });
   } else if (err.code === "23503") {
     response.status(404).send({ msg: "error: User not found" });
+  } else if (err.code === "42703") {
+    response.status(400).send({ msg: "Invalid sort query, try again." });
+  } else if (err.code === "42601") {
+    response.status(400).send({ msg: "Invalid order query, try again" });
   }
-  console.log(err.code);
   next(err);
 });
 

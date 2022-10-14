@@ -50,8 +50,8 @@ exports.patchUpdateReviews = (request, response, next) => {
 };
 
 exports.getAllReviews = (request, response, next) => {
-  const { category } = request.query;
-  fetchAllReviews(category)
+  const { sort_by, order, category } = request.query;
+  fetchAllReviews(sort_by, order, category)
     .then((reviews) => {
       response.status(200).send({ reviews });
     })
