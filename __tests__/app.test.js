@@ -138,7 +138,7 @@ describe("app", () => {
         });
     });
   });
-  describe.only("7. POST /api/reviews/:review_id/comments", () => {
+  describe("7. POST /api/reviews/:review_id/comments", () => {
     test("201: publish a new comment using username and body", () => {
       const newComment = {
         username: "mallionaire",
@@ -150,7 +150,6 @@ describe("app", () => {
         .expect(201)
         .then(({ body }) => {
           let comment = body.comments;
-          console.log(comment);
           expect(comment).toEqual({
             body: "Best comment ever.",
             votes: expect.any(Number),
@@ -239,6 +238,40 @@ describe("Error handling", () => {
             body: { msg },
           } = response;
           expect(msg).toBe("Review ID not found, try another number.");
+        });
+    });
+  });
+  describe("7. POST: /api/reviews/:review_id/comments", () => {
+    test("responds with a 400 when there is missing information provided", () => {
+      const newComment = {
+        username: "mallionaire",
+        body: "",
+      };
+      return request(app)
+        .post("/api/reviews/3/comments")
+        .send(newComment)
+        .expect(400)
+        .then((response) => {
+          const {
+            body: { msg },
+          } = response;
+          expect(msg).toBe("Please enter a comment and username");
+        });
+    });
+    test("Responds with a 404 with a non-existent username on db", () => {
+      const newComment = {
+        username: "RyderRoo",
+        body: "I am not a username",
+      };
+      return request(app)
+        .post("/api/reviews/3/comments")
+        .send(newComment)
+        .expect(404)
+        .then((response) => {
+          const {
+            body: { msg },
+          } = response;
+          expect(msg).toBe("error: User not found");
         });
     });
   });

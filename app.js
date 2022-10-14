@@ -31,9 +31,11 @@ app.use((err, request, response, next) => {
 app.use((err, request, response, next) => {
   if (err.code === "22P02") {
     response.status(400).send({ msg: "Invalid input, use a number" });
-  } else {
-    next(err);
+  } else if (err.code === "23503") {
+    response.status(404).send({ msg: "error: User not found" });
   }
+  console.log(err.code);
+  next(err);
 });
 
 app.use((err, request, response, next) => {

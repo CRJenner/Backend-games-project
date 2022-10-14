@@ -75,11 +75,9 @@ exports.postComment = (request, response, next) => {
   const { review_id } = request.params;
   postedComment(username, body, review_id)
     .then((comments) => {
-      console.log(comments);
       response.status(201).send({ comments });
     })
     .catch((err) => {
-      console.log(err);
       next(err);
     });
 };
