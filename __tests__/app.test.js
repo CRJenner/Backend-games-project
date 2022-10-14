@@ -188,6 +188,54 @@ describe("app", () => {
           });
         });
     });
+    test("collect a 200 status whcih accepts order query ?order=desc", () => {
+      "valid columns: title, designer, owner, review_body , category, votes, created_at";
+      return request(app)
+        .get("/api/reviews?order=desc")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toBeInstanceOf(Array);
+          expect(reviews).toHaveLength(13);
+          expect(reviews).toBeSortedBy("created_at", {
+            descending: true,
+          });
+          reviews.forEach((review) => {
+            expect(review).toMatchObject({
+              designer: expect.any(String),
+              title: expect.any(String),
+              category: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              review_body: expect.any(String),
+              comment_count: expect.any(Number),
+              owner: expect.any(String),
+            });
+          });
+        });
+    });
+    test("Collect a 200 status, accepts category query", () => {
+      return request(app)
+        .get("/api/reviews?category=dexterity")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toBeInstanceOf(Array);
+          expect(reviews).toHaveLength(1);
+          reviews.forEach((review) => {
+            expect(review).toMatchObject({
+              designer: expect.any(String),
+              title: expect.any(String),
+              category: "dexterity",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              review_body: expect.any(String),
+              comment_count: expect.any(Number),
+              owner: expect.any(String),
+            });
+          });
+        });
+    });
   });
 });
 
@@ -322,6 +370,16 @@ describe("Error handling", () => {
         .then(({ body }) => {
           const { msg } = body;
           expect(msg).toBe("Invalid order query, try again");
+        });
+    });
+    test("should return a 404 for non-existent category query", () => {
+      return request(app)
+        .get("/api/reviews?category=invalidCategory")
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          console.log(body);
+          expect(msg).toBe("Invalid category query, try again");
         });
     });
   });

@@ -1,4 +1,5 @@
 const db = require("../db/data/development-data/index");
+const { checkExists } = require("../db/seeds/utils");
 
 exports.fetchCategories = () => {
   return db.query(`SELECT * FROM categories;`).then(({ rows: categories }) => {
@@ -60,6 +61,7 @@ exports.fetchAllReviews = (
   order = "desc",
   category
 ) => {
+  console.log(category);
   const sortedQuery = [
     "title",
     "designer",
@@ -69,6 +71,7 @@ exports.fetchAllReviews = (
     "votes",
     "created_at",
   ];
+  const paramQuery = [];
   const orderQuery = ["asc", "desc"];
   let intitialQuery = `SELECT reviews.*,
 COUNT (comments.review_id) ::INT 
@@ -76,14 +79,14 @@ AS comment_count
 FROM reviews 
 LEFT JOIN comments ON comments.review_id = reviews.review_id`;
   if (category) {
-    (intitialQuery += `WHERE category = $1
+    paramQuery.push(category);
+    intitialQuery += ` WHERE category = $1
       GROUP BY reviews.review_id
-      ORDER BY reviews.${sort_by} ${order};`),
-      [category];
+      ORDER BY reviews.${sort_by} ${order};`;
   } else if (!category)
     intitialQuery += `  GROUP BY reviews.review_id
       ORDER BY reviews.${sort_by} ${order};`;
-  return db.query(intitialQuery).then(({ rows: review }) => {
+  return db.query(intitialQuery, paramQuery).then(({ rows: review }) => {
     if (!sortedQuery.includes(sort_by)) {
       return Promise.reject({
         status: 400,
@@ -94,7 +97,13 @@ LEFT JOIN comments ON comments.review_id = reviews.review_id`;
         status: 400,
         msg: "Invalid order query , try again",
       });
+    } else if (review.length === 0) {
+      return Promise.reject({
+        status: 404,
+        msg: "Invalid category query, try again",
+      });
     }
+    console.log(review);
     return review;
   });
 };
@@ -103,6 +112,8 @@ exports.fetchAllComments = (review_id) => {
   return db
     .query(
       `SELECT *
+
+
 FROM comments
 WHERE review_id = $1
 ORDER BY created_at DESC;`,
