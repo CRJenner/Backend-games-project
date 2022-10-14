@@ -55,7 +55,21 @@ exports.updateReviews = (review_id, inc_votes) => {
     });
 };
 
-exports.fetchAllReviews = (category) => {
+exports.fetchAllReviews = (
+  sort_by = "created_at",
+  order = "desc",
+  category
+) => {
+  const sortedQuery = [
+    "title",
+    "designer",
+    "owner",
+    "review_body",
+    "category",
+    "votes",
+    "created_at",
+  ];
+  const orderQuery = ["asc", "desc"];
   let intitialQuery = `SELECT reviews.*,
 COUNT (comments.review_id) ::INT 
 AS comment_count
@@ -64,12 +78,23 @@ LEFT JOIN comments ON comments.review_id = reviews.review_id`;
   if (category) {
     (intitialQuery += `WHERE category = $1
       GROUP BY reviews.review_id
-      ORDER BY reviews.created_at DESC;`),
+      ORDER BY reviews.${sort_by} ${order};`),
       [category];
   } else if (!category)
     intitialQuery += `  GROUP BY reviews.review_id
-      ORDER BY reviews.created_at DESC;`;
+      ORDER BY reviews.${sort_by} ${order};`;
   return db.query(intitialQuery).then(({ rows: review }) => {
+    if (!sortedQuery.includes(sort_by)) {
+      return Promise.reject({
+        status: 400,
+        msg: "Invalid sort query, try again",
+      });
+    } else if (!orderQuery.includes(order)) {
+      return Promise.reject({
+        status: 400,
+        msg: "Invalid order query , try again",
+      });
+    }
     return review;
   });
 };

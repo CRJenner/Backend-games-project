@@ -161,6 +161,34 @@ describe("app", () => {
         });
     });
   });
+  describe("8. Get /api/reviews (queries)", () => {
+    test("sort_by, which sorts the reviews by any valid column (defaults to date)", () => {
+      "valid columns: title, designer, owner, review_body , category, votes, created_at";
+      return request(app)
+        .get("/api/reviews?sort_by=votes")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toBeInstanceOf(Array);
+          expect(reviews).toHaveLength(13);
+          expect(reviews).toBeSortedBy("votes", {
+            descending: true,
+          });
+          reviews.forEach((review) => {
+            expect(review).toMatchObject({
+              designer: expect.any(String),
+              title: expect.any(String),
+              category: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              review_body: expect.any(String),
+              comment_count: expect.any(Number),
+              owner: expect.any(String),
+            });
+          });
+        });
+    });
+  });
 });
 
 describe("Error handling", () => {
@@ -272,6 +300,28 @@ describe("Error handling", () => {
             body: { msg },
           } = response;
           expect(msg).toBe("error: User not found");
+        });
+    });
+  });
+  describe("8 GET /api/reviews (queries)", () => {
+    test("Responds with a 400 for invalid sort_query", () => {
+      return request(app)
+        .get("/api/reviews?sort_by=invalidSort")
+        .expect(400)
+        .then((response) => {
+          const {
+            body: { msg },
+          } = response;
+          expect(msg).toBe("Invalid sort query, try again.");
+        });
+    });
+    test("should return status: 400 for invalid order query", () => {
+      return request(app)
+        .get("/api/reviews?order=invalidOrder")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Invalid order query, try again");
         });
     });
   });
