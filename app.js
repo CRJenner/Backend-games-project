@@ -7,7 +7,7 @@ const {
   getAllReviews,
   collectComments,
   postComment,
-} = require("./controllers/controllers");
+} = require("../controllers/controllers");
 const app = express();
 
 app.use(express.json());
