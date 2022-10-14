@@ -1,4 +1,4 @@
-const db = require("../db/data/development-data/index");
+const db = require("../db/connection");
 const { checkExists } = require("../db/seeds/utils");
 
 exports.fetchCategories = () => {
