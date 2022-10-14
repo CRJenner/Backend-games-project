@@ -1,4 +1,5 @@
 const express = require("express");
+const app = express();
 const {
   categoryObjects,
   reviewObject,
@@ -8,7 +9,6 @@ const {
   collectComments,
   postComment,
 } = require("./controllers/controllers");
-const app = express();
 
 app.use(express.json());
 
