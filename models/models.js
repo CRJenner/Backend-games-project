@@ -103,7 +103,6 @@ LEFT JOIN comments ON comments.review_id = reviews.review_id`;
         msg: "Invalid category query, try again",
       });
     }
-    console.log(review);
     return review;
   });
 };
@@ -151,5 +150,16 @@ exports.postedComment = (username, body, review_id) => {
         });
       }
       return comment[0];
+    });
+};
+
+exports.removeComment = (comment_id) => {
+  return db
+    .query(`DELETE FROM comments WHERE comment_id = $1  RETURNING *;`, [
+      comment_id,
+    ])
+    .then(({ rows }) => {
+      console.log(rows);
+      return rows;
     });
 };

@@ -6,6 +6,7 @@ const {
   fetchAllReviews,
   fetchAllComments,
   postedComment,
+  removeComment,
 } = require("../models/models");
 
 exports.categoryObjects = (request, response, next) => {
@@ -79,5 +80,25 @@ exports.postComment = (request, response, next) => {
     })
     .catch((err) => {
       next(err);
+    });
+};
+
+exports.deleteComment = (request, response, next) => {
+  console.log("Hi control");
+  const { comment_id } = request.params;
+  removeComment(comment_id)
+    .then((rows) => {
+      if (rows.length === 1) {
+        response.status(204).send({
+          msg: `The ${comment_id} has been deleted.`,
+        });
+      } else if (rows.length === 0) {
+        response.status(400).send({
+          msg: "Unable to delete as comment id not found.",
+        });
+      }
+    })
+    .catch((error) => {
+      next(error);
     });
 };

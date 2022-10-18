@@ -8,6 +8,7 @@ const {
   getAllReviews,
   collectComments,
   postComment,
+  deleteComment,
 } = require("./controllers/controllers");
 
 app.use(express.json());
@@ -19,6 +20,7 @@ app.patch("/api/reviews/:review_id", patchUpdateReviews);
 app.get("/api/reviews", getAllReviews);
 app.get("/api/reviews/:review_id/comments", collectComments);
 app.post("/api/reviews/:review_id/comments", postComment);
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.use((err, request, response, next) => {
   if (err.status && err.msg) {
