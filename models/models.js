@@ -61,7 +61,6 @@ exports.fetchAllReviews = (
   order = "desc",
   category
 ) => {
-  console.log(category);
   const sortedQuery = [
     "title",
     "designer",
@@ -159,7 +158,6 @@ exports.removeComment = (comment_id) => {
       comment_id,
     ])
     .then(({ rows }) => {
-      console.log(rows);
       return rows;
     });
 };

@@ -235,7 +235,7 @@ describe("app", () => {
           });
         });
     });
-    describe.only("9. DELETE /api/comments/:comment_id", () => {
+    describe("9. DELETE /api/comments/:comment_id", () => {
       test("should delete a comment with the comment_id and respond with 204 status", () => {
         return request(app).delete("/api/comments/2").expect(204);
       });
@@ -382,12 +382,11 @@ describe("Error handling", () => {
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          console.log(body);
           expect(msg).toBe("Invalid category query, try again");
         });
     });
   });
-  describe.only("12. DELETE /api/comments/:comment_id", () => {
+  describe("12. DELETE /api/comments/:comment_id", () => {
     test("should respond with status:400 comment_id is not a number", () => {
       return request(app)
         .delete("/api/comments/banana")

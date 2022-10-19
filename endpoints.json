@@ -21,14 +21,103 @@
       "reviews": [
         {
           "title": "One Night Ultimate Werewolf",
+          "review_id": 8,
           "designer": "Akihisa Okui",
           "owner": "happyamy2016",
           "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
           "category": "hidden-roles",
           "created_at": 1610964101251,
-          "votes": 5
+          "votes": 5,
+          "comment_count": 1
         }
       ]
     }
+  },
+  "GET /api/reviews/:review_id": {
+    "description": "A review object, which should have the following propertiess: review_id, title, review_body, designer, review_img_url, owner, category, votes, created_at.",
+    "queries": [],
+    "exampleResponse": {
+      "review_id": 2,
+      "title": "JengARRGGGH!",
+      "designer": "Leslie Scott",
+      "owner": "grumpy19",
+      "review_img_url": "https://images.pexels.com/photos/4009761/pexels-photo-4009761.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260",
+      "review_body": "Few games are equiped to fill a player with such a defined sense of mild-peril, but a friendly game of Jenga will turn the mustn't-make-it-fall anxiety all the way up to 11! Fiddly fun for all the family, this game needs little explaination. Whether you're a player who chooses to play it safe, or one who lives life on the edge, eventually the removal of blocks will destabilise the tower and all your Jenga dreams come tumbling down.",
+      "category": "dexterity",
+      "created_at": 1610964101251,
+      "votes": 5,
+      "comment_count": 1
+    }
+  },
+  "GET /api/users": {
+    "description": "an array of objects, each object should have the following property: username, name, avatar_url ",
+    "queries": [],
+    "exampleResponse": [
+      {
+        "username": "mallionaire",
+        "name": "haz",
+        "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+      },
+      {
+        "username": "philippaclaire9",
+        "name": "philippa",
+        "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+      }
+    ]
+  },
+  "PATCH /api/reviews/:review_id ": {
+    "description": "Request body accepts: an object in the form { inc_votes: newVote }and it will increment the votes based on the review_id.",
+    "queries": [],
+    "exampleResponse": {
+      "updated_review": {
+        "title": "Jenga",
+        "designer": "Leslie Scott",
+        "owner": "philippaclaire9",
+        "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+        "review_id": 2,
+        "review_body": "Fiddly fun for all the family",
+        "category": "dexterity",
+        "created_at": "2021-01-18T10:01:41.251Z",
+        "votes": 7
+      }
+    }
+  },
+  "GET /api/reviews/:review_id/comments": {
+    "description": "an array of comments for the given review_id of which each comment should have the following properties: comment_id, votes, created_at, author, body, review_id",
+    "queries": [],
+    "exampleResponse": [
+      {
+        "comment_id": 2,
+        "body": "My dog loved this game too!",
+        "votes": 13,
+        "author": "mallionaire",
+        "review_id": 3,
+        "created_at": "1610964545410"
+      },
+      {
+        "comment_id": 3,
+        "body": "I didn't know dogs could play games",
+        "votes": 10,
+        "author": "philippaclaire9",
+        "review_id": 3,
+        "created_at": 1610964588110
+      }
+    ]
+  },
+  "POST /api/reviews/:review_id/comments": {
+    "description": "takes a request body with username and body, and responds with a comment object",
+    "queries": [],
+    "exampleResponse": {
+      "body": "Best comment ever.",
+      "votes": 13,
+      "author": "mallionaire",
+      "review_id": 3,
+      "created_at": 1610964545410,
+      "comment_id": 2
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes the given comment by comment_id and returns a 204 status code with no content",
+    "queries": []
   }
 }

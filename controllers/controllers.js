@@ -84,7 +84,6 @@ exports.postComment = (request, response, next) => {
 };
 
 exports.deleteComment = (request, response, next) => {
-  console.log("Hi control");
   const { comment_id } = request.params;
   removeComment(comment_id)
     .then((rows) => {
