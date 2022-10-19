@@ -9,9 +9,12 @@ const {
   collectComments,
   postComment,
   deleteComment,
+  getEndpoints,
 } = require("./controllers/controllers");
 
 app.use(express.json());
+
+app.get("/api", getEndpoints);
 
 app.get("/api/categories", categoryObjects);
 app.get("/api/reviews/:review_id", reviewObject);

@@ -1,4 +1,5 @@
 const {
+  fetchEndpoints,
   fetchCategories,
   fetchReviews,
   fetchUsers,
@@ -8,6 +9,12 @@ const {
   postedComment,
   removeComment,
 } = require("../models/models");
+
+exports.getEndpoints = (request, response, next) => {
+  fetchEndpoints().then((endpoint) => {
+    response.status(200).send(endpoint);
+  });
+};
 
 exports.categoryObjects = (request, response, next) => {
   fetchCategories()

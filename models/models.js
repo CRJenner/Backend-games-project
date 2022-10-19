@@ -1,6 +1,12 @@
 const db = require("../db/connection");
 const { checkExists } = require("../db/seeds/utils");
 
+exports.fetchEndpoints = () => {
+  return fs.readFile("./endpoints.json").then((endpoints) => {
+    return JSON.parse(endpoints);
+  });
+};
+
 exports.fetchCategories = () => {
   return db.query(`SELECT * FROM categories;`).then(({ rows: categories }) => {
     return categories;
