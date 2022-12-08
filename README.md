@@ -8,7 +8,7 @@ The ftomnt end project will work using this project with ReactJS.
 
 # The link to the hosted API
 
-Here is the link to the API hosted on heroku: https://chloes-project-nc-games.herokuapp.com/api
+Here is the link to the API hosted on Cyclic: https://chloe-jenner-nc-games-be.cyclic.app/api
 
 # Instructions on setup and dependencies
 
