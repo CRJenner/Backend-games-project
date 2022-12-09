@@ -34,7 +34,9 @@ exports.reviewObject = (request, response, next) => {
     .then((review) => {
       response.status(200).send({ review });
     })
-    .catch(next);
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.collectUsers = (request, response, next) => {
@@ -76,7 +78,9 @@ exports.collectComments = (request, response, next) => {
     .then((comments) => {
       response.status(200).send({ comments });
     })
-    .catch(next);
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.postComment = (request, response, next) => {
