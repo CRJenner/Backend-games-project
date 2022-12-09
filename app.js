@@ -12,9 +12,17 @@ const {
   deleteComment,
   getEndpoints,
 } = require("./controllers/controllers");
-app.use(cors({
-  origin: true
-}));
+
+app.use(cors());
+app.options('*', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.send('ok');
+});
+
+app.use((req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+});
+
 app.use(express.json());
 
 app.get("/api", getEndpoints);
