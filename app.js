@@ -14,14 +14,11 @@ const {
 } = require("./controllers/controllers");
 
 app.use(cors());
-app.options('*', (req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  res.send('ok');
-});
-
-app.use((req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-});
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+  });
 
 app.use(express.json());
 
