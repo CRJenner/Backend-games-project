@@ -187,7 +187,7 @@ describe("app", () => {
           });
         });
     });
-    test("collect a 200 status whcih accepts order query ?order=desc", () => {
+    test("collect a 200 status which accepts order query ?order=desc", () => {
       "valid columns: title, designer, owner, review_body , category, votes, created_at";
       return request(app)
         .get("/api/reviews?order=desc")
@@ -198,6 +198,32 @@ describe("app", () => {
           expect(reviews).toHaveLength(13);
           expect(reviews).toBeSortedBy("created_at", {
             descending: true,
+          });
+          reviews.forEach((review) => {
+            expect(review).toMatchObject({
+              designer: expect.any(String),
+              title: expect.any(String),
+              category: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              review_body: expect.any(String),
+              comment_count: expect.any(Number),
+              owner: expect.any(String),
+            });
+          });
+        });
+    });
+    test("collect a 200 status which accepts order query ?order=asc", () => {
+      "valid columns: title, designer, owner, review_body , category, votes, created_at";
+      return request(app)
+        .get("/api/reviews?order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          const { reviews } = body;
+          expect(reviews).toBeInstanceOf(Array);
+          expect(reviews).toHaveLength(13);
+          expect(reviews).toBeSortedBy("created_at", {
+            ascending: true,
           });
           reviews.forEach((review) => {
             expect(review).toMatchObject({
