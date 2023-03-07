@@ -2,7 +2,7 @@ const {
   fetchAllComments,
   postedComment,
   removeComment,
-} = require("../models/models");
+} = require("../models/commentModel");
 
 
 

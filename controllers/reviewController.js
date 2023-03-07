@@ -1,7 +1,7 @@
 const {fetchReviews,
     updateReviews,
     fetchAllReviews
-} = require('../models/models')
+} = require('../models/reviewsModel')
 
 exports.reviewObject = (request, response, next) => {
     const { review_id } = request.params;

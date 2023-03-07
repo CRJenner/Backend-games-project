@@ -1,6 +1,6 @@
 const {
     fetchEndpoints
-  } = require("../models/models");
+  } = require("../models/endPointsModel");
   
 
 exports.getEndpoints = (request, response, next) => {

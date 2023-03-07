@@ -1,6 +1,6 @@
 const {
     fetchUsers
-  } = require("../models/models");
+  } = require("../models/usersModel");
   
   exports.collectUsers = (request, response, next) => {
     fetchUsers()

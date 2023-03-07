@@ -1,16 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const {  
-  collectComments,
-  postComment,
-  deleteComment,
-} = require("./controllers/commentController");
+const { collectComments,postComment, deleteComment} = require("./controllers/commentController");
 const {categoryObjects} = require("./controllers/categoriesController")
-const {reviewObject,
-  patchUpdateReviews,
-  getAllReviews
-} = require("./controllers/reviewController")
+const {reviewObject, patchUpdateReviews, getAllReviews} = require("./controllers/reviewController")
 const {collectUsers} = require("./controllers/usersController")
 const {getEndpoints} = require("./controllers/endPointController")
 
