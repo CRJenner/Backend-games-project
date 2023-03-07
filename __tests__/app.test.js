@@ -36,44 +36,74 @@ describe("app", () => {
       return request(app)
         .get("/api/categories")
         .expect(200)
-        .then((response) => {
-          const {
-            body: { category },
-          } = response;
-          category.forEach((category) => {
-            expect(category).toEqual(
-              expect.objectContaining({
+        .then(({body}) => {
+          const {category} = body;
+          category.forEach((categore) => {
+            expect(categore).toMatchObject({
                 slug: expect.any(String),
                 description: expect.any(String),
               })
-            );
-          });
+          })
+          expect(category).toHaveLength(4)
         });
     });
+      test("404: responds with a 404 for invalid path error", () => {
+        return request(app)
+        .get("/api/notAPath")
+        .expect(404)
+        .then(({body})=> {
+          expect(body.msg).toBe("Invalid pathway")
+        })
+      });
+    
   });
   describe("2. GET: /api/reviews/:review_id", () => {
     test("200: responds with a review object containing properties", () => {
-      const review_id = 2;
       return request(app)
-        .get(`/api/reviews/${review_id}`)
+        .get(`/api/reviews/2`)
         .expect(200)
-        .then((response) => {
-          const review = response.body.review;
-          expect(review).toEqual(
-            expect.objectContaining({
-              review_id: expect.any(Number),
-              title: expect.any(String),
-              review_body: expect.any(String),
-              designer: expect.any(String),
-              owner: expect.any(String),
-              review_img_url: expect.any(String),
-              review_body: expect.any(String),
-              category: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              comment_count: expect.any(Number),
+        .then(({body}) => {
+          const {review} = body
+          expect(review).toMatchObject({
+              review_id: 2,
+              title: 'Jenga',
+              review_body: 'Fiddly fun for all the family',
+              designer: 'Leslie Scott',
+              owner: 'philippaclaire9',
+              review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png', 
+              category: 'dexterity',
+              created_at: "2021-01-18T10:01:41.251Z",
+              votes: 5,
             })
-          );
+          
+        });
+    })
+    test('200: Adds comment count in the review', () => { 
+      return request(app)
+      .get(`/api/reviews/2`)
+      .expect(200)
+      .then(({body})=>{
+        const {review} = body
+        expect(review.comment_count).toBe(3)
+
+      })
+     })
+    test("400: responds with 400 for invalid review_id", () => {
+      return request(app)
+        .get("/api/reviews/invalid_Review_id")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Invalid input, use a number");
+        });
+    });
+    test("404: responds with a 404 if review_id is not in the db", () => {
+      return request(app)
+        .get("/api/reviews/99999")
+        .expect(404)
+        .then(({body}) => {
+          const {msg} = body
+          expect(msg).toBe("Review ID not found, try another number.");
         });
     });
   });
@@ -292,33 +322,8 @@ describe("app", () => {
 });
 
 describe("Error handling", () => {
-  describe("1. GET /api/categories", () => {
-    test("responds with a 404 for invalid path error", () => {
-      return request(app).get("/api/notAPath").expect(404);
-    });
-  });
-  describe("2. GET: /api/reviews/:review_id", () => {
-    test("responds with 400 for invalid review_id", () => {
-      return request(app)
-        .get("/api/reviews/banana")
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Invalid input, use a number");
-        });
-    });
-    test("responds with a 404 if review_id is not in the db", () => {
-      return request(app)
-        .get("/api/reviews/99999")
-        .expect(404)
-        .then((response) => {
-          const {
-            body: { msg },
-          } = response;
-          expect(msg).toBe("Review ID not found, try another number.");
-        });
-    });
-  });
+  
+
   describe("3. GET /api/users", () => {
     test("responds with a 404 for invalid path error", () => {
       return request(app).get("/api/notAUser").expect(404);
