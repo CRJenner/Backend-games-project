@@ -1,29 +1,24 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const {
-  categoryObjects,
-  reviewObject,
-  collectUsers,
-  patchUpdateReviews,
-  getAllReviews,
+const {  
   collectComments,
   postComment,
   deleteComment,
-  getEndpoints,
-} = require("./controllers/controllers");
+} = require("./controllers/commentController");
+const {categoryObjects} = require("./controllers/categoriesController")
+const {reviewObject,
+  patchUpdateReviews,
+  getAllReviews
+} = require("./controllers/reviewController")
+const {collectUsers} = require("./controllers/usersController")
+const {getEndpoints} = require("./controllers/endPointController")
 
 app.use(cors());
-// app.use(function(req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Headers", "X-Requested-With");
-//   next();
-//   });
 
 app.use(express.json());
 
 app.get("/api", getEndpoints);
-
 app.get("/api/categories", categoryObjects);
 app.get("/api/reviews/:review_id", reviewObject);
 app.get("/api/users", collectUsers);
@@ -33,13 +28,9 @@ app.get("/api/reviews/:review_id/comments", collectComments);
 app.post("/api/reviews/:review_id/comments", postComment);
 app.delete("/api/comments/:comment_id", deleteComment);
 
-app.use((err, request, response, next) => {
-  if (err.status && err.msg) {
-    response.status(err.status).send({ msg: err.msg });
-  } else {
-    next(err);
-  }
-});
+app.all("/*", (request, response, next) => {
+  response.status(404).send({ msg: "Invalid pathway"})
+})
 
 app.use((err, request, response, next) => {
   if (err.code === "22P02") {
@@ -52,6 +43,14 @@ app.use((err, request, response, next) => {
     response.status(400).send({ msg: "Invalid order query, try again" });
   }
   next(err);
+});
+
+app.use((err, request, response, next) => {
+  if (err.status && err.msg) {
+    response.status(err.status).send({ msg: err.msg });
+  } else {
+    next(err);
+  }
 });
 
 app.use((err, request, response, next) => {
