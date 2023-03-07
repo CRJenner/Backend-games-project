@@ -3,12 +3,34 @@ const testData = require("../db/data/test-data");
 const request = require("supertest");
 const app = require("../app");
 const db = require("../db/connection");
+const endpointsJson = require("../endpoints.json")
+
 
 beforeEach(() => seed(testData));
 
 afterAll(() => db.end());
 
 describe("app", () => {
+  describe("GET /api", () => {
+    test('200: GET - all available endpoints of the api ', () => {
+        return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({body}) => {
+            const { endpoint } = body
+            expect(endpoint).toEqual(endpointsJson)
+        })
+    });
+    test('404: Error issued for invalid endpoint ', () => {
+        return request(app)
+        .get("/Wrong_Endpoint")
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe("Invalid pathway")
+        })
+    });
+
+})
   describe("1. GET: /api/categories", () => {
     test("200: responds with an array of categories which should have the following properties, slug and description", () => {
       return request(app)

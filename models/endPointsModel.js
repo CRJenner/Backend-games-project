@@ -1,9 +1,8 @@
 const fs = require("fs/promises");
 
 exports.fetchEndpoints = () => {
-  console.log("model");
-  return fs.readFile("./endpoints.json").then((endpoints) => {
-    console.log(endpoints);
-    return JSON.parse(endpoints);
-  });
-};
+    return fs.readFile(`${__dirname}/../endpoints.json`, "utf-8")
+    .then((data) => {
+        return JSON.parse(data)
+    })
+}

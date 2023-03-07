@@ -5,8 +5,9 @@ const {
 
 exports.getEndpoints = (request, response, next) => {
     fetchEndpoints().then((endpoint) => {
-      console.log(endpoint);
-      response.status(200).send(endpoint);
-    });
-  };
+      response.status(200).send({endpoint});
+    })
+    .catch((error) => {
+        next(error)
+    })  };
   
