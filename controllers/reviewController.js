@@ -1,11 +1,11 @@
-const {fetchReviews,
+const {fetchReviewsById,
     updateReviews,
     fetchAllReviews
 } = require('../models/reviewsModel')
 
-exports.reviewObject = (request, response, next) => {
+exports.getReviewById = (request, response, next) => {
     const { review_id } = request.params;
-    fetchReviews(review_id)
+    fetchReviewsById(review_id)
       .then((review) => {
         response.status(200).send({ review });
       })

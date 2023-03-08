@@ -112,42 +112,39 @@ describe("app", () => {
       return request(app)
         .get("/api/users")
         .expect(200)
-        .then((response) => {
-          const {
-            body: { users },
-          } = response;
+        .then(({body}) => {
+          const {users}=body
+          expect(users).toHaveLength(4)
           users.forEach((user) => {
-            expect(user).toEqual(
-              expect.objectContaining({
+            expect(user).toMatchObject({
                 username: expect.any(String),
                 name: expect.any(String),
                 avatar_url: expect.any(String),
               })
-            );
+            
           });
         });
     });
+    test('404: responds with a 404 error for invalid path for a user', () => { 
+      return request(app)
+    .get("/api/NotAUser")
+    .expect(404)
+    .then(({body}) => {
+      const {msg} = body
+      expect(msg).toBe("Invalid pathway")
+    }) 
+  })
   });
   describe("4. PATCH /api/reviews/:review_id", () => {
-    test("200: Patch returns an object", () => {
-      const review_id = 2;
-      return request(app)
-        .patch(`/api/reviews/${review_id}`)
-        .send({ inc_votes: 1 })
-        .expect(200)
-        .then(({ body }) => {
-          expect(typeof body).toBe("object");
-        });
-    });
     test(`should update review by id in this form { inc_votes : newVote } and should respond with updated object.`, () => {
-      const review_id = 2;
       return request(app)
-        .patch(`/api/reviews/${review_id}`)
+        .patch(`/api/reviews/2`)
         .send({ inc_votes: 2 })
         .expect(200)
         .then(({ body }) => {
-          expect(body).toBeInstanceOf(Object);
-          expect(body).toEqual({
+          const patchedReview = body
+          expect(patchedReview).toBeInstanceOf(Object);
+          expect(patchedReview).toEqual({
             title: "Jenga",
             designer: "Leslie Scott",
             owner: "philippaclaire9",
@@ -161,7 +158,49 @@ describe("app", () => {
           });
         });
     });
+    test("400: responds with a 400 and returns error message when no valid number is entered", () => {
+      return request(app)
+        .patch(`/api/reviews/2`)
+        .send({ inc_votes: "one" })
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Invalid voting");
+        });
+    });
+    test("400: Responds with a 400 and returns and error message when no inc amount entered", () => {
+      return request(app)
+        .patch(`/api/reviews/2`)
+        .send({ inc_votes: "" })
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Invalid voting");
+        });
+    });
+    test('404: Should return an error for valid but not existent review_id', () => { 
+      return request(app)
+      .patch("/api/reviews/99999")
+      .send({ inc_votes: 1})
+      .expect(404)
+      .then(({body})=> {
+        const {msg} = body
+        expect(msg).toBe("Review id not found")
+      })
+     })
+     test('400: Should return an error for invalid key', () => {
+      return request(app)
+      .patch("/api/reviews/1")
+      .send({
+          notVotesKey: 5,
+      })
+      .expect(400)
+      .then(({body}) => {
+        const {msg} = body
+          expect(msg).toBe("Invalid voting")
+      })
   });
+})
   describe("6. GET: /api/reviews/:review_id/comments", () => {
     test("200: an array of comments for the given review_id of which each comment should have the following properties, comment_id, votes, created_at, author, body and review_id", () => {
       const review_id = 2;
@@ -324,35 +363,7 @@ describe("app", () => {
 describe("Error handling", () => {
   
 
-  describe("3. GET /api/users", () => {
-    test("responds with a 404 for invalid path error", () => {
-      return request(app).get("/api/notAUser").expect(404);
-    });
-  });
-  describe("4. PATCH: /api/reviews/:review_id", () => {
-    test("responds with a 400 and returns error message when no valid number is entered", () => {
-      const review_id = 2;
-      return request(app)
-        .patch(`/api/reviews/${review_id}`)
-        .send({ inc_votes: "one" })
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Invalid input, use a number");
-        });
-    });
-    test("Responds with a 400 and returns and error message when no inc amount entered", () => {
-      const review_id = 2;
-      return request(app)
-        .patch(`/api/reviews/${review_id}`)
-        .send({ inc_votes: "" })
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Invalid input, use a number");
-        });
-    });
-  });
+
   describe("6. GET: /api/reviews/:review_id/comments", () => {
     test("Responds with a 400 when the id is invalid", () => {
       return request(app)

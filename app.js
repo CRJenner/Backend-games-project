@@ -3,7 +3,7 @@ const cors = require("cors");
 const app = express();
 const { collectComments,postComment, deleteComment} = require("./controllers/commentController");
 const {categoryObjects} = require("./controllers/categoriesController")
-const {reviewObject, patchUpdateReviews, getAllReviews} = require("./controllers/reviewController")
+const {getReviewById, patchUpdateReviews, getAllReviews} = require("./controllers/reviewController")
 const {collectUsers} = require("./controllers/usersController")
 const {getEndpoints} = require("./controllers/endPointController")
 
@@ -13,7 +13,7 @@ app.use(express.json());
 
 app.get("/api", getEndpoints);
 app.get("/api/categories", categoryObjects);
-app.get("/api/reviews/:review_id", reviewObject);
+app.get("/api/reviews/:review_id", getReviewById);
 app.get("/api/users", collectUsers);
 app.patch("/api/reviews/:review_id", patchUpdateReviews);
 app.get("/api/reviews", getAllReviews);

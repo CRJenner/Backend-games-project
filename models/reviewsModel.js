@@ -1,7 +1,7 @@
 const db = require("../db/connection");
 
 
-exports.fetchReviews = (review_id) => {
+exports.fetchReviewsById = (review_id) => {
   return db
     .query(
       `SELECT reviews.*,
@@ -25,6 +25,12 @@ exports.fetchReviews = (review_id) => {
 };
 
 exports.updateReviews = (review_id, inc_votes) => {
+   if (!inc_votes || typeof inc_votes !== "number") {
+        return Promise.reject({
+          status: 400,
+          msg: "Invalid voting",
+        });
+      }
   return db
     .query(
       `UPDATE reviews
@@ -34,12 +40,13 @@ exports.updateReviews = (review_id, inc_votes) => {
       [inc_votes, review_id]
     )
     .then(({ rows: updateReviews }) => {
-      if (!inc_votes || typeof inc_votes !== "number") {
+      if(updateReviews.length===0){
         return Promise.reject({
-          status: 400,
-          msg: "Invalid input, use a number",
-        });
+            status: 404,
+            msg: "Review id not found"
+        }) 
       }
+     
       return updateReviews[0];
     });
 };
