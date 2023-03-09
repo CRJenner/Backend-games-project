@@ -94,7 +94,7 @@ describe("app", () => {
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Invalid input, use a number");
+          expect(msg).toBe("Invalid review id");
         });
     });
     test("404: responds with a 404 if review_id is not in the db", () => {
@@ -191,9 +191,7 @@ describe("app", () => {
      test('400: Should return an error for invalid key', () => {
       return request(app)
       .patch("/api/reviews/1")
-      .send({
-          notVotesKey: 5,
-      })
+      .send({ notVotesKey: 5 })
       .expect(400)
       .then(({body}) => {
         const {msg} = body
@@ -203,16 +201,14 @@ describe("app", () => {
 })
   describe("6. GET: /api/reviews/:review_id/comments", () => {
     test("200: an array of comments for the given review_id of which each comment should have the following properties, comment_id, votes, created_at, author, body and review_id", () => {
-      const review_id = 2;
       return request(app)
-        .get(`/api/reviews/${review_id}/comments`)
+        .get(`/api/reviews/2/comments`)
         .expect(200)
         .then(({ body }) => {
           let comments = body.comments;
           expect(comments.length).toEqual(3);
           comments.forEach((comment) => {
-            expect(comment).toEqual(
-              expect.objectContaining({
+            expect(comment).toMatchObject({
                 author: expect.any(String),
                 body: expect.any(String),
                 created_at: expect.any(String),
@@ -220,34 +216,134 @@ describe("app", () => {
                 votes: expect.any(Number),
                 review_id: expect.any(Number),
               })
-            );
           });
-          expect(comments).toBeSortedBy("created_at", {
-            descending: true,
-          });
+          
         });
     });
+    test('200: Responds with comments sorted by most recent in descending order. ', () => {
+      return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then(({body}) => {
+          const comment = body.comments;
+          expect(comment).toBeSorted({ key: 'created_at', descending: true})
+      })
+      
+  });
+    test("400: Responds with a 400 when the id is invalid", () => {
+      return request(app)
+        .get(`/api/reviews/invalidId/comments`)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({ msg: "Invalid review id" });
+        });
+    });
+    test("404: responds with a 404 if review_id is valid but no reviews", () => {
+      return request(app)
+        .get("/api/reviews/99999/comments")
+        .expect(404)
+        .then((response) => {
+          const {
+            body: { msg },
+          } = response;
+          expect(msg).toBe("Review ID not found, try another number.");
+        });
+    })
+    test("404: responds with a 404 for invalid pathway", () => {
+      return request(app)
+        .get("/api/reviews/2/commentssss")
+        .expect(404)
+        .then((response) => {
+          const {
+            body: { msg },
+          } = response;
+          expect(msg).toBe("Invalid pathway");
+        });
+    })
   });
   describe("7. POST /api/reviews/:review_id/comments", () => {
     test("201: publish a new comment using username and body", () => {
-      const newComment = {
-        username: "mallionaire",
-        body: "Best comment ever.",
-      };
       return request(app)
         .post("/api/reviews/3/comments")
-        .send(newComment)
+        .send( { username: "mallionaire", body: "Best comment ever." })
         .expect(201)
         .then(({ body }) => {
-          let comment = body.comments;
-          expect(comment).toEqual({
+          const {comments} = body;
+          expect(comments).toMatchObject({
             body: "Best comment ever.",
-            votes: expect.any(Number),
+            votes: 0,
             author: "mallionaire",
             review_id: 3,
             created_at: expect.any(String),
-            comment_id: expect.any(Number),
+            comment_id: 7,
           });
+        });
+    });
+    test('201: responds with new comment and ignores not needed properties', () => { 
+      return request(app)
+                .post("/api/reviews/3/comments")
+                .send( { username: "mallionaire", body: "unnecessary info here.", day: "Monday"})
+                .expect(201)
+                .then(({body})=>{
+                  const {comments} = body;
+                expect(comments).toMatchObject({
+                 body: "unnecessary info here.",
+                 votes: 0,
+                 author: "mallionaire",
+                  review_id: 3,
+                 created_at: expect.any(String),
+                 comment_id: 7,
+          });
+                })
+     })
+     test('400: Should return an error for invalid review_id', () => {
+      return request(app)
+      .post("/api/reviews/invalidReviewId/comments")
+      .send( { username: "mallionaire", body: "message body"})
+      .expect(400)
+      .then(({body}) => {
+        const {msg} = body
+          expect(msg).toBe("Invalid review id")
+      })
+  })
+  test('404: Should return an error for valid but not existent review_id', () => {
+    return request(app)
+    .post("/api/reviews/123456/comments")
+    .send( { username: "mallionaire", body: "message body"})
+    .expect(404)
+    .then(({body}) => {
+      const {msg} = body
+        expect(msg).toBe("Review Id not found")
+    })
+})
+    test("400: responds with a 400 when there is missing information on body", () => {
+      return request(app)
+        .post("/api/reviews/3/comments")
+        .send({username: "mallionaire"})
+        .expect(400)
+        .then(({body}) => {
+          const {msg} = body
+          expect(msg).toBe("Please enter a comment and username");
+        });
+    });
+    test("400: responds with a 400 when there is missing information on username", () => {
+      return request(app)
+        .post("/api/reviews/3/comments")
+        .send({body: "There is no username here"})
+        .expect(400)
+        .then(({body}) => {
+          const {msg} = body
+          expect(msg).toBe("Please enter a comment and username");
+        });
+    });
+    test("Responds with a 404 with a non-existent username on db", () => {
+      return request(app)
+        .post("/api/reviews/3/comments")
+        .send({ username: "RyderRoo", body: "I am not a username"})
+        .expect(404)
+        .then(({body}) => {
+          const {msg} = body
+          expect(msg).toBe("This is not a user");
         });
     });
   });
@@ -361,64 +457,7 @@ describe("app", () => {
 });
 
 describe("Error handling", () => {
-  
-
-
-  describe("6. GET: /api/reviews/:review_id/comments", () => {
-    test("Responds with a 400 when the id is invalid", () => {
-      return request(app)
-        .get(`/api/reviews/invalidId/comments`)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body).toEqual({ msg: "Invalid input, use a number" });
-        });
-    });
-    test("responds with a 404 if review_id is valid but no reviews", () => {
-      return request(app)
-        .get("/api/reviews/99999/comments")
-        .expect(404)
-        .then((response) => {
-          const {
-            body: { msg },
-          } = response;
-          expect(msg).toBe("Review ID not found, try another number.");
-        });
-    });
-  });
-  describe("7. POST: /api/reviews/:review_id/comments", () => {
-    test("responds with a 400 when there is missing information provided", () => {
-      const newComment = {
-        username: "mallionaire",
-        body: "",
-      };
-      return request(app)
-        .post("/api/reviews/3/comments")
-        .send(newComment)
-        .expect(400)
-        .then((response) => {
-          const {
-            body: { msg },
-          } = response;
-          expect(msg).toBe("Please enter a comment and username");
-        });
-    });
-    test("Responds with a 404 with a non-existent username on db", () => {
-      const newComment = {
-        username: "RyderRoo",
-        body: "I am not a username",
-      };
-      return request(app)
-        .post("/api/reviews/3/comments")
-        .send(newComment)
-        .expect(404)
-        .then((response) => {
-          const {
-            body: { msg },
-          } = response;
-          expect(msg).toBe("error: User not found");
-        });
-    });
-  });
+ 
   describe("8 GET /api/reviews (queries)", () => {
     test("Responds with a 400 for invalid sort_query", () => {
       return request(app)
@@ -457,7 +496,7 @@ describe("Error handling", () => {
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Invalid input, use a number");
+          expect(msg).toBe("Invalid review id");
         });
     });
     test("should respond with status:400 comment_id is not found in database", () => {

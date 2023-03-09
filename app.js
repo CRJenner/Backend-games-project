@@ -27,9 +27,11 @@ app.all("/*", (request, response, next) => {
 
 app.use((err, request, response, next) => {
   if (err.code === "22P02") {
-    response.status(400).send({ msg: "Invalid input, use a number" });
+    response.status(400).send({ msg: "Invalid review id" });
   } else if (err.code === "23503") {
-    response.status(404).send({ msg: "error: User not found" });
+    response.status(404).send({ msg: "This is not a user" });
+  } else if (err.code === "23502") {
+    response.status(404).send({ msg: "Review Id not found" });
   } else if (err.code === "42703") {
     response.status(400).send({ msg: "Invalid sort query, try again." });
   } else if (err.code === "42601") {
