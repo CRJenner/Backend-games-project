@@ -40,7 +40,7 @@ exports.deleteComment = (request, response, next) => {
           msg: `The ${comment_id} has been deleted.`,
         });
       } else if (rows.length === 0) {
-        response.status(400).send({
+        response.status(404).send({
           msg: "Unable to delete as comment id not found.",
         });
       }

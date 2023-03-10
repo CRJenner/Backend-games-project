@@ -431,36 +431,37 @@ describe("app", () => {
           expect(body.msg).toBe("Invalid order query, try again");
         });
     });
+  })
     
-    describe("9. DELETE /api/comments/:comment_id", () => {
-      test("should delete a comment with the comment_id and respond with 204 status", () => {
-        return request(app).delete("/api/comments/2").expect(204);
+   describe("9. DELETE /api/comments/:comment_id", () => {
+      test("204: should delete a comment with the comment_id and respond with 204 status", () => {
+        return request(app)
+        .delete("/api/comments/2")
+        .expect(204)
+        .then(({body})=>{
+          expect(body).toEqual({})
+        })
       });
+      test("400: should respond with status 400 comment_id is not a number", () => {
+        return request(app)
+          .delete("/api/comments/notACommentId")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid comment id");
+          });
+      });
+      test("404: should respond with status:400 comment_id is not found in database", () => {
+        return request(app)
+          .delete("/api/comments/4325353")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Unable to delete as comment id not found.");
+          });
+      });  
     });
   });
-});
 
-describe("Error handling", () => {
+
  
   
-  describe("12. DELETE /api/comments/:comment_id", () => {
-    test("should respond with status:400 comment_id is not a number", () => {
-      return request(app)
-        .delete("/api/comments/banana")
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Invalid review id");
-        });
-    });
-    test("should respond with status:400 comment_id is not found in database", () => {
-      return request(app)
-        .delete("/api/comments/4325353")
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Unable to delete as comment id not found.");
-        });
-    });
-  });
-});
+    
