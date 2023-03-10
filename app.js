@@ -31,12 +31,12 @@ app.use((err, request, response, next) => {
   } else if (err.code === "23503") {
     response.status(404).send({ msg: "This is not a user" });
   } else if (err.code === "23502") {
-    response.status(404).send({ msg: "Review Id not found" });
-  } else if (err.code === "42703") {
-    response.status(400).send({ msg: "Invalid sort query, try again." });
-  } else if (err.code === "42601") {
-    response.status(400).send({ msg: "Invalid order query, try again" });
-  }
+    response.status(404).send({ msg: "Review Id not found" });}
+  // } else if (err.code === "42703") {
+  //   response.status(400).send({ msg: "Invalid sort query, try again." });
+  // } else if (err.code === "42601") {
+  //   response.status(400).send({ msg: "Invalid order query, try again" });
+  // }
   next(err);
 });
 

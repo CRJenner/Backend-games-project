@@ -53,50 +53,41 @@ exports.updateReviews = (review_id, inc_votes) => {
 
 exports.fetchAllReviews = (
   sort_by = "created_at",
-  order = "desc",
+  order = "DESC",
   category
 ) => {
-  const sortedQuery = [
-    "title",
-    "designer",
-    "owner",
-    "review_body",
-    "category",
-    "votes",
-    "created_at",
-  ];
+
+  if( !["title", "designer", "owner", "review_body", "category", "votes",
+    "created_at", "review_id", "comment_count"].includes(sort_by)){ 
+    return Promise.reject({
+      status: 400,
+      msg:  "Invalid sort query, try again."
+    })
+  };
+  if(!["DESC", "ASC"].includes(order)){
+    return Promise.reject({
+        status: 400,
+        msg: "Invalid order query, try again"
+    })
+}
   const paramQuery = [];
-  const orderQuery = ["asc", "desc"];
-  let intitialQuery = `SELECT reviews.*,
+  let initialQuery = `SELECT reviews.*,
 COUNT (comments.review_id) ::INT 
 AS comment_count
 FROM reviews 
 LEFT JOIN comments ON comments.review_id = reviews.review_id`;
   if (category) {
     paramQuery.push(category);
-    intitialQuery += ` WHERE category = $1
+    initialQuery += ` WHERE category = $1
       GROUP BY reviews.review_id
-      ORDER BY reviews.${sort_by} ${order};`;
-  } else if (!category)
-    intitialQuery += `  GROUP BY reviews.review_id
-      ORDER BY reviews.${sort_by} ${order};`;
-  return db.query(intitialQuery, paramQuery).then(({ rows: review }) => {
-    if (!sortedQuery.includes(sort_by)) {
-      return Promise.reject({
-        status: 400,
-        msg: "Invalid sort query, try again",
-      });
-    } else if (!orderQuery.includes(order)) {
-      return Promise.reject({
-        status: 400,
-        msg: "Invalid order query , try again",
-      });
-    } else if (review.length === 0) {
-      return Promise.reject({
-        status: 404,
-        msg: "Invalid category query, try again",
-      });
-    }
+      ORDER BY ${sort_by} ${order};`;
+  } else {
+    initialQuery += `  GROUP BY reviews.review_id
+      ORDER BY ${sort_by} ${order};`}
+
+  return db.query(initialQuery, paramQuery)
+  .then(({ rows: review }) => {
+    
     return review;
   });
 };

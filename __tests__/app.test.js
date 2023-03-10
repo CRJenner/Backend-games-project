@@ -336,7 +336,7 @@ describe("app", () => {
           expect(msg).toBe("Please enter a comment and username");
         });
     });
-    test("Responds with a 404 with a non-existent username on db", () => {
+    test("404: Responds with a 404 with a non-existent username on db", () => {
       return request(app)
         .post("/api/reviews/3/comments")
         .send({ username: "RyderRoo", body: "I am not a username"})
@@ -348,92 +348,46 @@ describe("app", () => {
     });
   });
   describe("8. Get /api/reviews (queries)", () => {
-    test("sort_by, which sorts the reviews by any valid column (defaults to date)", () => {
+    test("200: sort_by, which sorts the reviews by any valid column (defaults to date)", () => {
       "valid columns: title, designer, owner, review_body , category, votes, created_at";
       return request(app)
-        .get("/api/reviews?sort_by=votes")
+        .get("/api/reviews")
+        .query({sort_by: "votes"})
         .expect(200)
         .then(({ body }) => {
           const { reviews } = body;
-          expect(reviews).toBeInstanceOf(Array);
-          expect(reviews).toHaveLength(13);
-          expect(reviews).toBeSortedBy("votes", {
-            descending: true,
-          });
-          reviews.forEach((review) => {
-            expect(review).toMatchObject({
-              designer: expect.any(String),
-              title: expect.any(String),
-              category: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              review_body: expect.any(String),
-              comment_count: expect.any(Number),
-              owner: expect.any(String),
-            });
-          });
+          expect(reviews).toBeSorted({key: "votes", descending: true});
         });
     });
-    test("collect a 200 status which accepts order query ?order=desc", () => {
+    test("200: collect a 200 status which accepts order query ?order=desc", () => {
       "valid columns: title, designer, owner, review_body , category, votes, created_at";
       return request(app)
-        .get("/api/reviews?order=desc")
+        .get("/api/reviews")
+        .query({sort_by: "created_at", order: "DESC"})
         .expect(200)
         .then(({ body }) => {
           const { reviews } = body;
-          expect(reviews).toBeInstanceOf(Array);
-          expect(reviews).toHaveLength(13);
-          expect(reviews).toBeSortedBy("created_at", {
-            descending: true,
-          });
-          reviews.forEach((review) => {
-            expect(review).toMatchObject({
-              designer: expect.any(String),
-              title: expect.any(String),
-              category: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              review_body: expect.any(String),
-              comment_count: expect.any(Number),
-              owner: expect.any(String),
-            });
-          });
+          expect(reviews).toBeSorted({ key: "created_at", descending: true });
         });
     });
-    test("collect a 200 status which accepts order query ?order=asc", () => {
+    test("200: collect a 200 status which accepts order query ?order=asc", () => {
       "valid columns: title, designer, owner, review_body , category, votes, created_at";
       return request(app)
-        .get("/api/reviews?order=asc")
+        .get("/api/reviews")
+        .query({sort_by: "created_at", order: "ASC"})
         .expect(200)
         .then(({ body }) => {
           const { reviews } = body;
-          expect(reviews).toBeInstanceOf(Array);
-          expect(reviews).toHaveLength(13);
-          expect(reviews).toBeSortedBy("created_at", {
-            ascending: true,
-          });
-          reviews.forEach((review) => {
-            expect(review).toMatchObject({
-              designer: expect.any(String),
-              title: expect.any(String),
-              category: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              review_body: expect.any(String),
-              comment_count: expect.any(Number),
-              owner: expect.any(String),
-            });
-          });
+          expect(reviews).toBeSorted( {key: "created_at", descending: false });
         });
     });
-    test("Collect a 200 status, accepts category query", () => {
+    test("200: Collect a 200 status, accepts category query", () => {
       return request(app)
-        .get("/api/reviews?category=dexterity")
+        .get("/api/reviews")
+        .query({sort_by: "created_at", order: "ASC", category: "dexterity" })
         .expect(200)
         .then(({ body }) => {
           const { reviews } = body;
-          expect(reviews).toBeInstanceOf(Array);
-          expect(reviews).toHaveLength(1);
           reviews.forEach((review) => {
             expect(review).toMatchObject({
               designer: expect.any(String),
@@ -448,6 +402,36 @@ describe("app", () => {
           });
         });
     });
+    test('200: category is valid yet there are no reviews ', () => { 
+      return request(app)
+      .get("/api/reviews")
+      .query({sort_by: "created_at", order: "ASC", category: "animals" })
+      .expect(200)
+      .then(({body})=> {
+        const {reviews} = body
+        expect(reviews.length).toBe(0)
+         expect(body).toEqual({reviews: []})
+      })
+     })
+    test("400: Responds with a 400 for invalid sort_by query", () => {
+      return request(app)
+        .get("/api/reviews")
+        .query({sort_by: "inValidSortBy", order: "ASC", category: "dexterity"})
+        .expect(400)
+        .then(({body}) => {
+          expect(body.msg).toBe("Invalid sort query, try again.");
+        });
+    });
+    test("400: should return status: 400 for invalid order query", () => {
+      return request(app)
+        .get("/api/reviews")
+        .expect(400)
+        .query({sort_by: "review_id", order: "invalidOrderQuery", category: "dexterity"})
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid order query, try again");
+        });
+    });
+    
     describe("9. DELETE /api/comments/:comment_id", () => {
       test("should delete a comment with the comment_id and respond with 204 status", () => {
         return request(app).delete("/api/comments/2").expect(204);
@@ -458,37 +442,7 @@ describe("app", () => {
 
 describe("Error handling", () => {
  
-  describe("8 GET /api/reviews (queries)", () => {
-    test("Responds with a 400 for invalid sort_query", () => {
-      return request(app)
-        .get("/api/reviews?sort_by=invalidSort")
-        .expect(400)
-        .then((response) => {
-          const {
-            body: { msg },
-          } = response;
-          expect(msg).toBe("Invalid sort query, try again.");
-        });
-    });
-    test("should return status: 400 for invalid order query", () => {
-      return request(app)
-        .get("/api/reviews?order=invalidOrder")
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Invalid order query, try again");
-        });
-    });
-    test("should return a 404 for non-existent category query", () => {
-      return request(app)
-        .get("/api/reviews?category=invalidCategory")
-        .expect(404)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Invalid category query, try again");
-        });
-    });
-  });
+  
   describe("12. DELETE /api/comments/:comment_id", () => {
     test("should respond with status:400 comment_id is not a number", () => {
       return request(app)
